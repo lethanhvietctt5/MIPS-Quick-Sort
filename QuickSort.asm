@@ -3,8 +3,8 @@ array: .space 4000
 before: .asciiz "before sort: "
 after: .asciiz "after sort: "
 space: .asciiz " "
-fileName: .asciiz "C:\\Users\\Admin\\Desktop\\input.txt"
-fileOutput: .asciiz "C:\\Users\\Admin\\Desktop\\output.txt"
+fileName: .asciiz "input.txt"
+fileOutput: .asciiz "output.txt"
 newline : .asciiz "\n"
 buffer: .asciiz ""
 number: .asciiz ""
@@ -21,17 +21,17 @@ main:
 	move $a0,$s0
 	syscall
 
-	# pointer
+	# pointer to buffer 
 	la $t0, buffer
 	li $t3,0
 	li $t2,0
 
-	#get N and array positive integer
+	#get N (N is number of element) and array positive integer
 	jal getN
 	sub $v1,$t5,1	
 	jal getArr
 
-	# print array
+	# print array before sort
 	add $t5,$v1,1	# t5 = number of array
 	li $t0,0
 	la $t4,array
@@ -45,17 +45,15 @@ main:
 	jal quickSort
 
 	jal newLine
-	# print array
+	# print array after sort
 	li $t0,0
 	la $t4,array
 	jal printArr
 
-	# convert array to string
-
+	# convert array to string and write to file
 	la $t4,array
 	li $t2,0
 	la $t6,number
-	# write to file
 
 	li $v0,13
 	la $a0,fileOutput
@@ -69,6 +67,7 @@ main:
 	li $v0,16
 	move $a0,$s1
 	syscall
+
 	# end program
 	li $v0,10
 	syscall
@@ -105,7 +104,7 @@ getN:
 exitGetN: 
 	move $t5, $t2
 	li $t2,0
-	addi $t0,$t0,2
+	addi $t0,$t0,2	# add 2 to ignore /r/n in file
 	jr $ra
 getArr:
 	lb $t1,($t0)
@@ -162,9 +161,9 @@ swap:
 	jr $ra
 quickSort:
 	sub $sp,$sp,16
-	sw $a0,($sp) # store a0 = array
-	sw $a1,4($sp)	# store a1 = left 
-	sw $a2,8($sp)	# store a2 = right
+	sw $a0,($sp) # store a0 (ao point to array)
+	sw $a1,4($sp)	# store a1 (a1 = left)
+	sw $a2,8($sp)	# store a2 (a2 = right)
 	sw $ra,12($sp)
 
 	bgt $a1,$a2,endQS
